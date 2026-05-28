@@ -1,0 +1,17 @@
+{
+  "name": "calendar-monitoring",
+  "version": "1.1.0",
+  "description": "Backend for Calendar Monitoring booking requests with conflict detection + real-time updates.",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "mysql2": "^3.22.4",
+    "socket.io": "^4.8.3"
+  }
+}
