@@ -1,0 +1,627 @@
+<!Doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CHO MAIN CALENDAR MONITORING</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#101a2e;
+      --muted:#a9b4d0;
+      --text:#e8eeff;
+      --border:rgba(255,255,255,.10);
+      --good:#35d07f;
+      --warn:#ffcc66;
+      --bad:#ff5c7a;
+      --info:#63b3ff;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:linear-gradient(180deg,var(--bg),#060a14);
+      color:var(--text);
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:20px}
+    h1{font-size:20px;margin:0 0 10px}
+    .sub{color:var(--muted);margin-bottom:18px;font-size:13px;line-height:1.4}
+
+    .grid{display:grid;grid-template-columns:420px 1fr;gap:16px}
+    @media (max-width: 980px){.grid{grid-template-columns:1fr}}
+
+    .card{
+      background:rgba(16,26,46,.92);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:14px;
+      box-shadow:0 10px 30px rgba(0,0,0,.25);
+    }
+    label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
+    input, select, textarea{
+      width:100%;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--text);
+      border-radius:10px;
+      padding:10px 10px;
+      outline:none;
+    }
+    textarea{min-height:72px;resize:vertical}
+
+    .row{display:flex;gap:10px}
+    .row > *{flex:1}
+
+    button{
+      cursor:pointer;
+      border:0;
+      border-radius:12px;
+      padding:11px 12px;
+      font-weight:650;
+      color:#041018;
+      background:linear-gradient(90deg,#7cf7b1,#63b3ff);
+      width:100%;
+      margin-top:12px;
+    }
+    button.secondary{background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.15)}
+
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      font-size:12px;
+      color:var(--muted);
+    }
+    .dot{width:8px;height:8px;border-radius:50%}
+
+    .status-pill{font-weight:700}
+    .good{color:var(--good)}
+    .warn{color:var(--warn)}
+    .bad{color:var(--bad)}
+    .info{color:var(--info)}
+
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th, td{border-bottom:1px solid rgba(255,255,255,.08);padding:10px 8px;vertical-align:top}
+    th{font-size:12px;color:var(--muted);text-align:left;font-weight:700}
+    td{font-size:13px}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .smallbtn{
+      padding:7px 9px;border-radius:10px;border:1px solid rgba(255,255,255,.15);
+      background:rgba(255,255,255,.05);color:var(--text);font-weight:650;font-size:12px
+    }
+
+    .banner{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      border-radius:12px;
+      padding:10px 12px;
+      margin-top:10px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+    }
+
+    .conflict{
+      margin-top:10px;
+      border-radius:12px;
+      padding:10px 12px;
+      border:1px solid rgba(255,92,122,.35);
+      background:rgba(255,92,122,.10);
+      color:#ffd3dc;
+      font-size:12px;
+      display:none;
+    }
+
+    .loghead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+    .loghead .left{display:flex;flex-direction:column;gap:6px}
+    .kpi{display:flex;gap:10px;flex-wrap:wrap}
+    .kpi .cardmini{
+      padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
+      min-width:130px
+    }
+    .cardmini .v{font-size:18px;font-weight:900}
+    .cardmini .t{font-size:12px;color:var(--muted)}
+
+    .muted{color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <h1 style="margin:0">CHO CONFERENCE SCHEDULE</h1>
+      <button class="secondary" id="logoutBtn" style="width:auto;margin-top:0">LOG OUT</button>
+    </div>
+    <div class="sub">
+     CITY HEALTH OFFICE LAGUERTA
+    </div>
+
+
+    <div class="grid">
+      <div class="card">
+        <div class="loghead">
+          <div class="left">
+            <div class="pill"><span class="dot" style="background:var(--info)"></span><span><b>Add booking request</b></span></div>
+            <div class="muted" style="font-size:12px;line-height:1.4">
+            </div>
+          </div>
+        </div>
+
+        <label>Department / Requester</label>
+        <input id="department" placeholder="e.g., HR Department" />
+
+        <label>Event Title</label>
+        <input id="title" placeholder="e.g., Staff Training" />
+
+        <div class="row">
+          <div>
+            <label>Date</label>
+            <input id="date" type="date" />
+          </div>
+          <div>
+            <label>Status</label>
+            <select id="status">
+              <option value="Pending">Pending</option>
+              <option value="Approved">Approved</option>
+              <option value="Cancelled">Cancelled</option>
+              <option value="Completed">Completed</option>
+              <option value="Postponed">Postponed</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Start Time</label>
+            <input id="startTime" type="time" />
+          </div>
+          <div>
+            <label>End Time</label>
+            <input id="endTime" type="time" />
+          </div>
+        </div>
+
+        <label>Venue / Location</label>
+        <input id="venue" placeholder="e.g., Conference Room A" />
+
+        <label>Number of Participants</label>
+        <input id="participants" type="number" min="1" placeholder="e.g., 35" />
+
+        <label>Required Equipment / Support</label>
+        <input id="equipment" placeholder="e.g., Projector, Microphone" />
+
+        <label>Approval Status / Remarks</label>
+        <textarea id="remarks" placeholder="Approver notes, reminders, special instructions..."></textarea>
+
+        <div class="conflict" id="conflictBox"></div>
+
+        <button id="saveBtn">Save request</button>
+        <button class="secondary" id="clearBtn" style="margin-top:10px">Clear all data</button>
+
+        <div class="banner">
+          <b>Monitoring checklist (quick):</b><br/>
+          - Pending approvals flagged<br/>
+          - Upcoming activities highlighted (today/next 7 days)<br/>
+          - Conflicts for same-venue overlap<br/>
+          - Records by status and remarks
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="loghead">
+          <div class="left">
+            <div class="pill"><span class="dot" style="background:var(--good)"></span><span><b>Monitoring Log</b></span></div>
+            <div class="muted" style="font-size:12px">Table mirrors the suggested monitoring format.</div>
+          </div>
+
+        <div class="kpi" id="kpis"></div>
+        <div id="logFilterBar" class="banner" style="display:none;margin-top:12px">
+          <span class="muted" id="logFilterLabel"></span>
+          <button class="smallbtn" id="clearLogFilterBtn" style="width:auto">Clear filter</button>
+        </div>
+      </div>
+
+        <table>
+
+          <thead>
+            <tr>
+              <th style="width:110px">Date</th>
+              <th style="width:130px">Time</th>
+              <th style="width:150px">Department</th>
+              <th style="width:220px">Activity/Event</th>
+              <th style="width:220px">Venue</th>
+              <th style="width:110px">Status</th>
+              <th>Remarks</th>
+              <th style="width:190px">Actions</th>
+            </tr>
+
+
+
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'calendar-monitoring-requests-v1';
+
+    /** Helpers **/
+    const pad2 = n => String(n).padStart(2,'0');
+
+    function toMinutes(t){
+      // t: "HH:MM"
+      if(!t) return NaN;
+      const [hh, mm] = t.split(':').map(Number);
+      return hh*60 + mm;
+    }
+
+    function overlaps(startA, endA, startB, endB){
+      // half-open interval [start, end)
+      return startA < endB && startB < endA;
+    }
+
+    function statusColor(status){
+      switch(status){
+        case 'Approved': return 'good';
+        case 'Pending': return 'warn';
+        case 'Cancelled': return 'bad';
+        case 'Completed': return 'info';
+        case 'Postponed': return 'warn';
+        default: return '';
+      }
+    }
+
+    function makeStatusPill(status){
+      const cls = statusColor(status);
+      return `<span class="status-pill ${cls}">${status}</span>`;
+    }
+
+    function readAll(){
+      try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+      catch{ return []; }
+    }
+
+    function writeAll(list){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    }
+
+    function uid(){
+      return Math.random().toString(16).slice(2) + Date.now().toString(16);
+    }
+
+    function normalizeVenue(v){
+      return (v||'').trim().toLowerCase();
+    }
+
+    function normalizeDept(d){
+      return (d||'').trim();
+    }
+
+    function normalizeTitle(t){
+      return (t||'').trim();
+    }
+
+    function conflictCandidates(existing, draft){
+      const draftVenue = normalizeVenue(draft.venue);
+      const draftDate = draft.date;
+      const aStart = toMinutes(draft.startTime);
+      const aEnd = toMinutes(draft.endTime);
+
+      return existing.filter(r => {
+        const sameVenue = normalizeVenue(r.venue) === draftVenue;
+        const sameDate = r.date === draftDate;
+        const bStart = toMinutes(r.startTime);
+        const bEnd = toMinutes(r.endTime);
+
+        // Flag overlaps against requests that are not cancelled
+        const relevant = r.status !== 'Cancelled' && r.status !== 'Postponed';
+        return sameVenue && sameDate && relevant && overlaps(aStart, aEnd, bStart, bEnd);
+      });
+    }
+
+    let logFilter = null; // null | 'Cancelled' | 'Approved' | 'Pending' | 'Upcoming7'
+
+    function withinUpcoming7(r, todayYMD, in7YMD){
+      if(!r?.date) return false;
+      const status = r.status;
+      if(status === 'Cancelled' || status === 'Postponed') return false;
+      return r.date >= todayYMD && r.date <= in7YMD;
+    }
+
+
+    function filterList(list, todayYMD, in7YMD){
+      if(!logFilter) return list;
+      switch(logFilter){
+        case 'Cancelled': return list.filter(r => r.status === 'Cancelled');
+        case 'Approved': return list.filter(r => r.status === 'Approved');
+        case 'Pending': return list.filter(r => r.status === 'Pending');
+        case 'Upcoming7': return list.filter(r => withinUpcoming7(r, todayYMD, in7YMD));
+        default: return list;
+      }
+    }
+
+    function render(){
+      const all = readAll().sort((a,b)=> (a.date.localeCompare(b.date)) || (a.startTime.localeCompare(b.startTime)) );
+      const tbody = document.getElementById('rows');
+      tbody.innerHTML = '';
+
+      const today = new Date();
+      const todayYMD = `${today.getFullYear()}-${pad2(today.getMonth()+1)}-${pad2(today.getDate())}`;
+      const in7 = new Date(today.getTime() + 7*24*60*60*1000);
+      const in7YMD = `${in7.getFullYear()}-${pad2(in7.getMonth()+1)}-${pad2(in7.getDate())}`;
+
+      let pendingCount = 0;
+      let upcomingCount = 0;
+      let approvedCount = 0;
+      let cancelledCount = 0;
+
+      for(const r of all){
+        const status = r.status;
+        if(status === 'Pending') pendingCount++;
+        if(status === 'Approved') approvedCount++;
+        if(status === 'Cancelled') cancelledCount++;
+
+        if(status !== 'Cancelled' && status !== 'Postponed'){
+          if(r.date >= todayYMD && r.date <= in7YMD) upcomingCount++;
+        }
+      }
+
+      const list = filterList(all, todayYMD, in7YMD);
+      for(const r of list){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${r.date}</td>
+          <td>${r.startTime}</td>
+          <td>${r.department}</td>
+
+          <td>${r.title}</td>
+          <td>${r.venue}</td>
+          <td>${makeStatusPill(r.status)}</td>
+          <td>
+            <div style="white-space:pre-wrap">${(r.remarks||'').replaceAll('<','<').replaceAll('>','>')}</div>
+            <div class="muted" style="margin-top:6px;font-size:12px">
+              Participants: ${r.participants ?? ''}<br/>
+              Equipment: ${(r.equipment||'')}
+            </div>
+          </td>
+          <td>
+            <div class="actions">
+              <button class="smallbtn" data-act="edit" data-id="${r.id}">Edit</button>
+              <button class="smallbtn" data-act="delete" data-id="${r.id}" style="border-color:rgba(255,92,122,.35)">Delete</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      // KPIs (clickable)
+      const kpis = document.getElementById('kpis');
+      const kpiActive = (key) => logFilter === key ? 'border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.07)' : '';
+
+      kpis.innerHTML = `
+        <div class="cardmini" role="button" tabindex="0" data-kpi="Pending" style="cursor:pointer;${kpiActive('Pending')}">
+          <div class="t">Pending approvals</div>
+          <div class="v ${pendingCount? 'warn':''}">${pendingCount}</div>
+        </div>
+        <div class="cardmini" role="button" tabindex="0" data-kpi="Approved" style="cursor:pointer;${kpiActive('Approved')}">
+          <div class="t">Approved</div>
+          <div class="v ${approvedCount? 'good':''}">${approvedCount}</div>
+        </div>
+        <div class="cardmini" role="button" tabindex="0" data-kpi="Upcoming7" style="cursor:pointer;${kpiActive('Upcoming7')}">
+          <div class="t">Upcoming (7 days)</div>
+          <div class="v ${upcomingCount? 'info':''}">${upcomingCount}</div>
+        </div>
+        <div class="cardmini" role="button" tabindex="0" data-kpi="Cancelled" style="cursor:pointer;${kpiActive('Cancelled')}">
+          <div class="t">Cancelled</div>
+          <div class="v ${cancelledCount? 'bad':''}">${cancelledCount}</div>
+        </div>
+      `;
+
+      const logFilterBar = document.getElementById('logFilterBar');
+      const logFilterLabel = document.getElementById('logFilterLabel');
+      if(logFilter){
+        const label = logFilter === 'Upcoming7' ? 'Upcoming (7 days)' : logFilter === 'Pending' ? 'Pending approvals' : logFilter;
+        logFilterLabel.textContent = `Showing: ${label}`;
+        logFilterBar.style.display = 'block';
+      } else {
+        logFilterBar.style.display = 'none';
+      }
+    }
+
+
+    function setConflictBox(html){
+      const box = document.getElementById('conflictBox');
+      if(!html){ box.style.display='none'; box.innerHTML=''; return; }
+      box.style.display='block';
+      box.innerHTML = html;
+    }
+
+    let editingId = null;
+
+    function fillForm(item){
+      editingId = item.id;
+      document.getElementById('department').value = item.department || '';
+      document.getElementById('title').value = item.title || '';
+      document.getElementById('date').value = item.date || '';
+      document.getElementById('status').value = item.status || 'Pending';
+      document.getElementById('startTime').value = item.startTime || '';
+      document.getElementById('endTime').value = item.endTime || '';
+      document.getElementById('venue').value = item.venue || '';
+      document.getElementById('participants').value = item.participants ?? '';
+      document.getElementById('equipment').value = item.equipment || '';
+      document.getElementById('remarks').value = item.remarks || '';
+
+      document.getElementById('saveBtn').textContent = 'Update request';
+    }
+
+    function clearForm(){
+      editingId = null;
+      document.getElementById('department').value='';
+      document.getElementById('title').value='';
+      document.getElementById('date').value='';
+      document.getElementById('status').value='Pending';
+      document.getElementById('startTime').value='';
+      document.getElementById('endTime').value='';
+      document.getElementById('venue').value='';
+      document.getElementById('participants').value='';
+      document.getElementById('equipment').value='';
+      document.getElementById('remarks').value='';
+      document.getElementById('saveBtn').textContent = 'Save request';
+      setConflictBox('');
+    }
+
+    function validateDraft(d){
+      const required = ['department','title','date','startTime','endTime','venue','status'];
+      for(const k of required){
+        if(!d[k] && d[k] !== 0) return `Missing required field: ${k}`;
+      }
+      const a = toMinutes(d.startTime);
+      const b = toMinutes(d.endTime);
+      if(Number.isNaN(a) || Number.isNaN(b)) return 'Invalid start/end time';
+      if(b <= a) return 'End time must be after start time';
+      return null;
+    }
+
+    function checkConflictsForDraft(d){
+      const list = readAll();
+      let candidates = conflictCandidates(list, d);
+
+      if(editingId){
+        candidates = candidates.filter(r => r.id !== editingId);
+      }
+
+      if(!candidates.length){
+        return null;
+      }
+
+      const lines = candidates.slice(0,5).map(r => {
+        return `• ${r.title} (${r.startTime}-${r.endTime}) — ${r.status} (Venue: ${r.venue})`;
+      }).join('<br/>');
+
+      const more = candidates.length > 5 ? `<div class="muted">(+${candidates.length-5} more conflicts)</div>` : '';
+
+      return `
+        <b>Schedule conflict detected</b><br/>
+        Overlapping reservation(s) at <b>${d.venue}</b> on <b>${d.date}</b>:<br/>
+        ${lines}
+        ${more}
+      `;
+    }
+
+    function getDraft(){
+      return {
+        id: editingId,
+        department: document.getElementById('department').value.trim(),
+        title: document.getElementById('title').value.trim(),
+        date: document.getElementById('date').value,
+        status: document.getElementById('status').value,
+        startTime: document.getElementById('startTime').value,
+        endTime: document.getElementById('endTime').value,
+        venue: document.getElementById('venue').value.trim(),
+        participants: document.getElementById('participants').value === '' ? null : Number(document.getElementById('participants').value),
+        equipment: document.getElementById('equipment').value.trim(),
+        remarks: document.getElementById('remarks').value
+      };
+    }
+
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      const draft = getDraft();
+      const err = validateDraft(draft);
+      if(err){
+        alert(err);
+        return;
+      }
+
+      const conflictHtml = checkConflictsForDraft(draft);
+      setConflictBox(conflictHtml ? conflictHtml : '');
+
+      // Always save, but highlight conflict. If you want to block saving, add a guard here.
+      const list = readAll();
+      if(editingId){
+        const idx = list.findIndex(x => x.id === editingId);
+        if(idx !== -1){
+          list[idx] = {...draft, id: editingId};
+        }
+      } else {
+        list.push({...draft, id: uid()});
+      }
+
+      writeAll(list);
+      render();
+      clearForm();
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      if(!confirm('Clear all saved requests from this browser?')) return;
+      localStorage.removeItem(STORAGE_KEY);
+      clearForm();
+      render();
+    });
+
+    document.getElementById('rows').addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-id]');
+      if(!btn) return;
+      const id = btn.getAttribute('data-id');
+      const act = btn.getAttribute('data-act');
+      const list = readAll();
+      const item = list.find(x => x.id === id);
+      if(!item) return;
+
+      if(act === 'delete'){
+        if(!confirm('Delete this request?')) return;
+        writeAll(list.filter(x => x.id !== id));
+        render();
+        if(editingId === id) clearForm();
+        return;
+      }
+
+      if(act === 'edit'){
+        fillForm(item);
+      }
+    });
+
+    // KPI tile filtering
+    document.getElementById('kpis').addEventListener('click', (e) => {
+      const tile = e.target.closest('[data-kpi]');
+      if(!tile) return;
+      const key = tile.getAttribute('data-kpi');
+      // toggle behavior
+      logFilter = (logFilter === key) ? null : key;
+      render();
+    });
+
+    document.getElementById('kpis').addEventListener('keydown', (e) => {
+      if(e.key !== 'Enter' && e.key !== ' ') return;
+      const tile = e.target.closest('[data-kpi]');
+      if(!tile) return;
+      const key = tile.getAttribute('data-kpi');
+      logFilter = (logFilter === key) ? null : key;
+      render();
+    });
+
+    document.getElementById('clearLogFilterBtn').addEventListener('click', () => {
+      logFilter = null;
+      render();
+    });
+
+    // LOG OUT (go back to admin login)
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', async () => {
+        try {
+          await fetch('/api/logout', { method: 'POST' });
+        } catch (e) {}
+        window.location.href = '/login';
+      });
+    }
+
+    // initial render
+    render();
+  </script>
+
+</body>
+</html>
+

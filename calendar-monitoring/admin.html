@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Login</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#101a2e;
+      --muted:#a9b4d0;
+      --text:#e8eeff;
+      --border:rgba(255,255,255,.10);
+      --good:#35d07f;
+      --warn:#ffcc66;
+      --bad:#ff5c7a;
+      --info:#63b3ff;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:linear-gradient(180deg,var(--bg),#060a14);
+      color:var(--text);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+    .card{
+      width:100%;
+      max-width:420px;
+      background:rgba(16,26,46,.92);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:18px;
+      box-shadow:0 10px 30px rgba(0,0,0,.25);
+    }
+    h1{font-size:18px;margin:0 0 6px}
+    .sub{color:var(--muted);margin:0 0 16px;font-size:13px;line-height:1.4}
+    label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
+    input{
+      width:100%;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--text);
+      border-radius:10px;
+      padding:10px 10px;
+      outline:none;
+    }
+    .err{
+      display:none;
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,92,122,.35);
+      background:rgba(255,92,122,.10);
+      color:#ffd3dc;
+      font-size:12px;
+      line-height:1.35;
+      white-space:pre-wrap;
+    }
+    button{
+      cursor:pointer;
+      border:0;
+      border-radius:12px;
+      padding:11px 12px;
+      font-weight:650;
+      color:#041018;
+      background:linear-gradient(90deg,#7cf7b1,#63b3ff);
+      width:100%;
+      margin-top:14px;
+    }
+    a{color:var(--info);text-decoration:none}
+    .meta{margin-top:14px;color:var(--muted);font-size:12px;line-height:1.4}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Admin Login</h1>
+    <div class="sub">Enter credentials to access the Calendar Monitoring dashboard.</div>
+
+    <form id="loginForm">
+      <label>Username</label>
+      <input id="username" name="username" autocomplete="username" placeholder="Admin username" />
+
+      <label>Password</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Admin password" />
+
+      <div class="err" id="errorBox"></div>
+      <button type="submit">Login</button>
+
+      <button type="button" class="secondary" id="logoutBtn" style="margin-top:10px;display:none">Log out</button>
+
+      <div class="meta">
+        Default server-side credentials configured by environment variables.
+      </div>
+    </form>
+  </div>
+
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const errorBox = document.getElementById('errorBox');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorBox.style.display = 'none';
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      const res = await fetch('/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      if (!res.ok) {
+        let msg = 'Login failed.';
+        try {
+          const data = await res.json();
+          if (data && data.error) msg = data.error;
+        } catch {}
+        errorBox.textContent = msg;
+        errorBox.style.display = 'block';
+        return;
+      }
+
+      window.location.href = '/';
+    });
+  </script>
+</body>
+</html>
+
