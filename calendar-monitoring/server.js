@@ -81,9 +81,9 @@ app.get('/api/requests', requireAuth, (req, res) => {
   res.json({ data: "Secure admin data here" });
 });
 
-app.listen(3000, () => console.log('Server running on port 3000'));
+//app.listen(3000, () => console.log('Server running on port 3000'));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+//app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-});
+    module.exports = app;
